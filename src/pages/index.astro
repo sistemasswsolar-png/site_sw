@@ -4,23 +4,29 @@ import Img from '../components/Img.astro';
 import Num from '../components/Num.astro';
 import Split from '../components/Split.astro';
 import Video from '../components/Video.astro';
+import HeroChat from '../components/HeroChat.astro';
+import Historia from '../components/Historia.astro';
+import Estrutura from '../components/Estrutura.astro';
+import Perguntas from '../components/Perguntas.astro';
 import Simulador from '../components/Simulador.astro';
+import Depoimentos from '../components/Depoimentos.astro';
 import Monitor from '../components/Monitor.astro';
-import { CONTATO, UNIDADES, NUMEROS, USINAS, totalMWp, DESTAQUES, OBRAS, DEPOIMENTOS, waLink, fmt, decs } from '../data/site';
+import Faq from '../components/Faq.astro';
+import { CONTATO, UNIDADES, NUMEROS, USINAS, totalMWp, DESTAQUES, OBRAS, waLink, fmt, decs } from '../data/site';
 
 const wa = waLink();
 const maxMWp = Math.max(...USINAS.map((u) => u.mwp));
 const faixa = [...DESTAQUES, ...OBRAS];
 const nav = [
   ['quem-somos', 'Quem somos'], ['estrutura', 'Estrutura'], ['engenharia', 'Engenharia'], ['solucoes', 'Soluções'],
-  ['simulador', 'Simulador'], ['portfolio', 'Portfólio'], ['clientes', 'Clientes'], ['contato', 'Contato'],
+  ['simulador', 'Simulador'], ['portfolio', 'Portfólio'], ['clientes', 'Clientes'], ['faq', 'Dúvidas'],
 ];
 const fases = [
   { nome: 'Engenharia', foto: 'engenharia/engenharia', etapas: [['Estudo', 'Consumo, área e viabilidade'], ['Dimensionamento', 'Potência, arranjo e geração'], ['Projeto', 'Elétrico, estrutural e documentação']] },
   { nome: 'Suprimentos e obra', foto: 'engenharia/obra', etapas: [['Suprimentos', 'A partir do estoque próprio'], ['Logística', 'Transporte próprio até a obra'], ['Execução', 'Montagem por equipe própria'], ['Comissionamento', 'Testes, medições e verificação']] },
   { nome: 'Entrega e operação', foto: 'engenharia/operacao', etapas: [['Homologação', 'Processo junto à concessionária'], ['Monitoramento', 'Acompanhamento da geração'], ['O&M', 'Manutenção preventiva e corretiva']] },
 ];
-let n = 0;
+const passos = fases.flatMap((f, fi) => f.etapas.map(([t, s], j) => ({ t, s, f: fi + 1, fase: f.nome, primeiro: j === 0 })));
 const segs = [
   { t: 'Usinas fotovoltaicas', s: 'Usinas em solo de MWp', f: 'solucoes/usinas' },
   { t: 'Indústria', s: 'Telhados industriais e coberturas', f: 'solucoes/industria' },
@@ -29,181 +35,196 @@ const segs = [
 ];
 const entrega = [['mesas', 'Mesas'], ['drenagem', 'Drenagem'], ['caixas', 'Caixas de passagem'], ['qgbt', 'QGBT'], ['inversores', 'Inversores'], ['sala-inversores', 'Sala de inversores'], ['transformador', 'Transformador'], ['casa-forca', 'Casa de força'], ['cabine', 'Cabine de entrada'], ['iluminacao-cftv', 'Iluminação e CFTV']];
 const filtros = [['todos', 'Todos'], ['industria', 'Indústria'], ['agro', 'Agronegócio'], ['comercio', 'Comércio'], ['outros', 'Outros']];
+const frase = 'Uma empresa de engenharia e soluções em energia.'.split(' ');
+const mapa = (u: (typeof UNIDADES)[number]) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${u.end}, ${u.cidade} - ${u.uf}`)}`;
 ---
 <Base
   title="SW Solar | Engenharia e soluções em energia solar no Paraná e Santa Catarina"
   description="Do estudo à construção, da engenharia à operação. Usinas fotovoltaicas, indústria, agronegócio e comércio, com estoque, logística e equipe próprios. Simule sua economia."
 >
-<header class="hdr" id="hdr"><div class="wrap in">
-  <a class="brand" href="#inicio" aria-label="SW Solar, início"><Img src="logo/sw-branco" alt="SW Solar" widths={[300]} sizes="210px" priority /></a>
-  <nav class="nav" id="nav" aria-label="Seções">
-    {nav.map(([id, t]) => <a href={`#${id}`}>{t}</a>)}
-  </nav>
-  <a class="btn pri" target="_blank" rel="noopener" href={wa}>Falar com a SW</a>
-  <button class="menu" id="menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav"><span></span></button>
-</div></header>
+<header class="hdr" id="hdr">
+  <div class="pill">
+    <a class="brand" href="#inicio" aria-label="SW Solar, início">
+      <Img src="logo/sw-branco" alt="SW Solar" widths={[300]} sizes="190px" priority class="lg-branco" />
+      <Img src="logo/sw-cor" alt="" widths={[300]} sizes="190px" class="lg-cor" />
+    </a>
+    <nav class="nav" id="nav" aria-label="Seções">
+      {nav.map(([id, t]) => <a href={`#${id}`}>{t}</a>)}
+    </nav>
+    <a class="cta-pill" target="_blank" rel="noopener" href={wa}>Falar com a SW <i aria-hidden="true">→</i></a>
+    <button class="menu" id="menu" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="mnav"><span></span></button>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="Menu">
+  {nav.map(([id, t], i) => <a href={`#${id}`} style={`--i:${i}`}>{t}</a>)}
+  <a class="btn pri" href={wa} target="_blank" rel="noopener">Falar com a SW no WhatsApp</a>
+</nav>
 
 <main>
-<section class="hero" id="inicio">
+<section class="hero" id="inicio" data-prog="exit">
   <div class="bg"><Img src="hero/ufv-demori" alt="Vista aérea da UFV Demori, usina solar executada pela SW Solar" widths={[768, 1200, 1500]} sizes="100vw" priority /></div>
-  <div class="wrap">
-    <p class="proof rv"><i></i>+{fmt(NUMEROS.projetos)} projetos instalados no PR e SC</p>
-    <Split tag="h1" text="Engenharia e soluções em energia." delay={150} />
-    <p class="lead rv" style="--i:4">Do estudo à construção, da engenharia à operação. Estoque, logística e equipe próprios para entregar projetos de todos os portes.</p>
-    <div class="ctas rv" style="--i:5">
-      <a class="btn pri" href={wa} target="_blank" rel="noopener">Falar com um especialista</a>
-      <a class="btn sec" href="#simulador">Simular minha economia</a>
+  <div class="wrap hero-grid">
+    <div class="hero-txt">
+      <p class="proof rv"><i></i>+{fmt(NUMEROS.projetos)} projetos instalados no PR e SC</p>
+      <Split tag="h1" text="Engenharia e soluções em energia." delay={250} />
+      <p class="lead rv" style="--i:4">Do estudo à construção, da engenharia à operação. Estoque, logística e equipe próprios para entregar projetos de todos os portes.</p>
+      <div class="ctas rv" style="--i:5">
+        <a class="btn pri" href={wa} target="_blank" rel="noopener">Falar com um especialista <i aria-hidden="true">→</i></a>
+        <a class="btn sec" href="#simulador">Simular minha economia</a>
+      </div>
+      <div class="cred rv" style="--i:6">
+        <div><b><Num value={NUMEROS.anos} /><small>anos</small></b><span>de história</span></div>
+        <div><b><Num value={NUMEROS.unidades} /><small>unidades</small></b><span>no Paraná</span></div>
+        <div><b><Num value={Math.round(totalMWp * 10) / 10} dec={1} /><small>MWp</small></b><span>nas 4 grandes usinas em destaque</span></div>
+      </div>
     </div>
-    <div class="cred rv" style="--i:6">
-      <div><b><Num value={NUMEROS.anos} /><small>anos</small></b><span>de história</span></div>
-      <div><b><Num value={NUMEROS.unidades} /><small>unidades</small></b><span>no Paraná</span></div>
-      <div><b><Num value={Math.round(totalMWp * 10) / 10} dec={1} /><small>MWp</small></b><span>nas 4 grandes usinas em destaque</span></div>
-    </div>
+    <figure class="hero-fone">
+      <HeroChat />
+      <figcaption>Exemplo de atendimento com o simulador do site</figcaption>
+    </figure>
   </div>
-  <div class="foto-leg">UFV Demori, Cruzeiro do Sul/PR<br />3,407 MWp</div>
   <span class="scroll" aria-hidden="true"></span>
 </section>
 
-<div class="tick" aria-label="Obras entregues pela SW Solar">
-  <div class="row">
-    {[0, 1].map((k) => (
-      <ul aria-hidden={k === 1 ? 'true' : undefined}>
-        {faixa.map((o) => <li>{o.nome}<span>{fmt(o.kwp, decs(o.kwp))} kWp</span></li>)}
-      </ul>
-    ))}
-  </div>
-</div>
-
-<section class="sec light" id="quem-somos"><div class="wrap split">
-  <div>
-    <div class="rv"><Img src="logo/sw-cor" alt="SW Solar, a número 1 em energia solar" widths={[600]} sizes="360px" class="logo-cor" /></div>
-    <p class="kick rv" style="--i:1">Quem somos</p>
-    <h2 class="h2 rv" style="--i:1">Nós somos a SW Solar.</h2>
-    <p class="lead rv" style="--i:2">Engenharia e soluções integradas em energia solar. Atendemos do pequeno projeto às usinas de grande porte, com a mesma equipe responsável do estudo à operação.</p>
-    <div class="blk">
-      <div class="rv" style="--i:3"><b>Propósito</b><span>Soluções completas para geração de energia pelo sol, com responsabilidade com as próximas gerações.</span></div>
-      <div class="rv" style="--i:4"><b>Como trabalhamos</b><span>Ética, transparência e integridade com clientes, fornecedores e colaboradores.</span></div>
-      <div class="rv" style="--i:5"><b>Onde estamos</b><span>Matriz em Ponta Grossa e unidades em Palmeira, Guarapuava e Imbituva.</span></div>
-    </div>
-  </div>
-  <div class="ph-img rv-img"><Img src="quem-somos/matriz" alt="Fachada da matriz da SW Solar em Ponta Grossa" sizes="(max-width:900px) 100vw, 45vw" /></div>
-</div></section>
-
-<section class="sec" id="trajetoria"><div class="wrap">
-  <p class="kick rv">Nossa trajetória</p>
-  <h2 class="h2 rv"><Num value={NUMEROS.anos} /> anos.</h2>
-  <div class="traj">
-    <ol class="steps">
-      <li>Começamos com um propósito.<small>Soluções completas em energia solar, com responsabilidade ambiental.</small></li>
-      <li>Crescemos com nossos clientes.</li>
-      <li>Construímos uma estrutura.<small>Estoque, logística e equipes próprias.</small></li>
-      <li>Formamos um time.</li>
-      <li>Entregamos grandes projetos.<small>Usinas de MWp no Paraná.</small></li>
-      <li>E continuamos evoluindo.<small>Monitoramento, O&amp;M e gestão de ativos.</small></li>
-    </ol>
-    <div class="fotos festa">
-      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <div class="ph-img rv-img" style={`--i:${i}`}><Img src={`trajetoria/festa-${i}`} alt="Festa de 5 anos da SW Solar" widths={i === 1 ? [600, 1000] : [360]} sizes={i === 1 ? '(max-width:900px) 100vw, 45vw' : '15vw'} pos={i === 6 ? '50% 25%' : undefined} /></div>
+<section class="sheet light" id="quem-somos" data-prog="enter" data-theme="light">
+  <div class="tick" aria-label="Obras entregues pela SW Solar">
+    <div class="row">
+      {[0, 1].map((k) => (
+        <ul aria-hidden={k === 1 ? 'true' : undefined}>
+          {faixa.map((o) => <li>{o.nome}<span>{fmt(o.kwp, decs(o.kwp))} kWp</span></li>)}
+        </ul>
       ))}
     </div>
   </div>
-</div></section>
+  <div class="sec"><div class="wrap split">
+    <div>
+      <div class="rv"><Img src="logo/sw-cor" alt="SW Solar, a número 1 em energia solar" widths={[600]} sizes="360px" class="logo-cor" /></div>
+      <p class="kick rv" style="--i:1">Quem somos</p>
+      <h2 class="h2 rv" style="--i:1">Nós somos a SW Solar.</h2>
+      <p class="lead rv" style="--i:2">Engenharia e soluções integradas em energia solar. Atendemos do pequeno projeto às usinas de grande porte, com a mesma equipe responsável do estudo à operação.</p>
+      <div class="blk">
+        <div class="rv" style="--i:3"><b>Propósito</b><span>Soluções completas para geração de energia pelo sol, com responsabilidade com as próximas gerações.</span></div>
+        <div class="rv" style="--i:4"><b>Como trabalhamos</b><span>Ética, transparência e integridade com clientes, fornecedores e colaboradores.</span></div>
+        <div class="rv" style="--i:5"><b>Onde estamos</b><span>Matriz em Ponta Grossa e unidades em Palmeira, Guarapuava e Imbituva.</span></div>
+      </div>
+    </div>
+    <div class="ph-img rv-img foto-matriz" data-tilt="6"><Img src="quem-somos/matriz" alt="Fachada da matriz da SW Solar em Ponta Grossa" sizes="(max-width:900px) 100vw, 45vw" /><span class="tilt-luz" aria-hidden="true"></span></div>
+  </div></div>
+</section>
 
-<section class="sec estr-hero" id="estrutura">
-  <div class="bg"><Img src="estrutura/fundo" alt="" widths={[480]} /></div>
+<Historia />
+
+<Estrutura />
+
+<section class="sec sheet" id="pessoas" data-prog="enter">
   <div class="wrap">
-    <p class="kick rv">Estrutura</p>
-    <Split tag="p" class="frase" text="Não é apenas sobre gerar energia." destaque="É sobre ter estrutura para entregar." />
-    <div class="cards3">
-      <article class="card rv" style="--i:1"><div class="ph-img"><Img src="estrutura/estoque" alt="Estoque de equipamentos" sizes="(max-width:900px) 100vw, 33vw" /></div><div class="cb"><span class="n">01</span><h3>Estoque próprio.</h3><p>Equipamentos disponíveis antes de a obra começar.</p></div></article>
-      <article class="card rv" style="--i:2"><div class="ph-img"><Img src="estrutura/logistica" alt="Caminhão da frota SW Solar em obra de usina em solo" sizes="(max-width:900px) 100vw, 33vw" pos="30% 50%" /></div><div class="cb"><span class="n">02</span><h3>Logística própria.</h3><p>Do nosso estoque até o canteiro, com transporte próprio.</p></div></article>
-      <article class="card rv" style="--i:3"><div class="ph-img"><Img src="estrutura/equipe" alt="Equipe de instalação SW Solar com EPI em telhado comercial" sizes="(max-width:900px) 100vw, 33vw" pos="50% 62%" /></div><div class="cb"><span class="n">03</span><h3>Equipe própria de instalação.</h3><p>Quem instala é quem responde pela instalação.</p></div></article>
+    <p class="kick rv">Pessoas</p>
+    <h2 class="h2 rv">Presentes onde nossos clientes estão.</h2>
+    <p class="lead rv">Engenharia, obra, comercial e pós-venda sob o mesmo teto.</p>
+    <div class="pess">
+      <Video class="rv" video="time-feira" poster="pessoas/feira-poster" nome="Time SW em feira" sub="Estande SW Solar na região" />
+      <Video class="rv" video="time-reunido" poster="pessoas/time-poster" nome="Time SW Solar reunido" />
+      <div class="ph-img rv-img" style="--i:2"><Img src="pessoas/feira" alt="Equipe SW Solar em feira" widths={[432]} sizes="25vw" /></div>
+      <div class="ph-img rv-img" style="--i:3"><Img src="pessoas/encontro" alt="Encontro do time SW Solar" widths={[432]} sizes="25vw" /></div>
     </div>
   </div>
 </section>
 
-<section class="sec dark2" id="pessoas"><div class="wrap">
-  <p class="kick rv">Pessoas</p>
-  <h2 class="h2 rv">Presentes onde nossos clientes estão.</h2>
-  <p class="lead rv">Engenharia, obra, comercial e pós-venda sob o mesmo teto.</p>
-  <div class="pess">
-    <Video class="rv" video="time-feira" poster="pessoas/feira-poster" nome="Time SW em feira" sub="Estande SW Solar na região" />
-    <Video class="rv" video="time-reunido" poster="pessoas/time-poster" nome="Time SW Solar reunido" />
-    <div class="ph-img rv-img" style="--i:2"><Img src="pessoas/feira" alt="Equipe SW Solar em feira" widths={[432]} sizes="25vw" /></div>
-    <div class="ph-img rv-img" style="--i:3"><Img src="pessoas/encontro" alt="Encontro do time SW Solar" widths={[432]} sizes="25vw" /></div>
-  </div>
-</div></section>
-
-<section class="sec" id="engenharia"><div class="wrap">
-  <p class="kick rv">Engenharia</p>
-  <h2 class="h2 rv">Da engenharia à operação.</h2>
-  <p class="lead rv">Uma única empresa responde por todas as etapas, do primeiro estudo à manutenção da usina.</p>
-  <div class="fases">
-    {fases.map((f, i) => (
-      <div class="fase rv" style={`--i:${i}`}>
-        <div class="ph-img"><Img src={f.foto} alt="" sizes="(max-width:900px) 100vw, 33vw" /></div>
-        <p>{f.nome}</p>
-        {f.etapas.map(([b, s], j) => { n++; return <div class="ps" style={`--j:${j}`}><i>{String(n).padStart(2, '0')}</i><b>{b}</b><span>{s}</span></div>; })}
+<section class="sec sheet dark2 eng-sec" id="engenharia" data-prog="enter" data-f="1">
+  <div class="wrap">
+    <p class="kick rv">Engenharia</p>
+    <h2 class="h2 rv">Da engenharia à operação.</h2>
+    <p class="lead rv">Uma única empresa responde por todas as etapas, do primeiro estudo à manutenção da usina.</p>
+    <div class="eng">
+      <div class="eng-midia rv">
+        <div class="eng-fotos">
+          {fases.map((f, i) => (
+            <figure class="eng-foto" data-f={i + 1}><Img src={f.foto} alt={`Etapa de ${f.nome.toLowerCase()} em usina da SW Solar`} sizes="(max-width:900px) 100vw, 45vw" /><figcaption>{f.nome}</figcaption></figure>
+          ))}
+        </div>
+        <div class="eng-cont" aria-hidden="true"><b class="eng-atual">01</b><small>/ 10</small><em class="eng-fase">Engenharia</em></div>
       </div>
-    ))}
+      <div class="eng-lista" data-prog="center">
+        <span class="eng-trilho" aria-hidden="true"><i></i></span>
+        <ol class="eng-passos">
+          {passos.map((p, i) => (
+            <li class="ps" data-f={p.f} data-fase={p.fase}>
+              <i>{String(i + 1).padStart(2, '0')}</i>
+              <div>{p.primeiro && <em>{p.fase}</em>}<b>{p.t}</b><span>{p.s}</span></div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
   </div>
-</div></section>
+</section>
 
-<section class="sec dark2" id="padrao"><div class="wrap">
-  <p class="kick rv">Padrão SW Solar</p>
-  <h2 class="h2 rv">Engenharia também está nos detalhes.</h2>
-  <div class="padrao">
-    {[['inversores', 'Inversores'], ['cabeamento', 'Cabeamento e conectores'], ['eletrodutos', 'Eletrodutos'], ['qgbt', 'Quadro geral (QGBT)'], ['sala-inversores', 'Sala de inversores']].map(([f, t], i) => (
-      <div class="ph-img rv-img" style={`--i:${i}`}><Img src={`padrao/${f}`} alt={t} sizes={i === 0 ? '(max-width:700px) 100vw, 50vw' : '(max-width:700px) 50vw, 25vw'} /><span class="t">{t}</span></div>
-    ))}
+<section class="sec sheet" id="padrao" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Padrão SW Solar</p>
+    <h2 class="h2 rv">Engenharia também está nos detalhes.</h2>
+    <div class="padrao">
+      {[['inversores', 'Inversores'], ['cabeamento', 'Cabeamento e conectores'], ['eletrodutos', 'Eletrodutos'], ['qgbt', 'Quadro geral (QGBT)'], ['sala-inversores', 'Sala de inversores']].map(([f, t], i) => (
+        <div class="ph-img rv-img" style={`--i:${i}`}><Img src={`padrao/${f}`} alt={t} sizes={i === 0 ? '(max-width:700px) 100vw, 50vw' : '(max-width:700px) 50vw, 25vw'} /><span class="t">{t}</span></div>
+      ))}
+    </div>
   </div>
-</div></section>
+</section>
 
-<section class="sec light" id="solucoes"><div class="wrap">
-  <p class="kick rv">Soluções</p>
-  <h2 class="h2 rv">Do pequeno projeto às usinas de grande porte.</h2>
-  <div class="segs">
-    {segs.map((s, i) => (
-      <a class="seg rv" style={`--i:${i}`} href="#simulador"><Img src={s.f} alt="" sizes="(max-width:900px) 50vw, 25vw" /><div><b>{s.t}</b><span>{s.s}</span><em>Simular economia →</em></div></a>
-    ))}
+<section class="sec sheet light" id="solucoes" data-prog="enter" data-theme="light">
+  <div class="wrap">
+    <p class="kick rv">Soluções</p>
+    <h2 class="h2 rv">Do pequeno projeto às usinas de grande porte.</h2>
+    <div class="segs">
+      {segs.map((s, i) => (
+        <div class="rv" style={`--i:${i}`}>
+          <a class="seg" href="#simulador" data-tilt="9"><Img src={s.f} alt="" sizes="(max-width:900px) 50vw, 25vw" /><div><b>{s.t}</b><span>{s.s}</span><em>Simular economia →</em></div><span class="tilt-luz" aria-hidden="true"></span></a>
+        </div>
+      ))}
+    </div>
+    <div class="chips rv"><span>Sistemas híbridos</span><span>Monitoramento</span><span>Operação e manutenção</span><span>Residencial</span></div>
   </div>
-  <div class="chips rv"><span>Sistemas híbridos</span><span>Monitoramento</span><span>Operação e manutenção</span><span>Residencial</span></div>
-</div></section>
+</section>
+
+<Perguntas />
 
 <Simulador />
 
-<section class="sec" id="portfolio"><div class="wrap">
-  <p class="kick rv">Portfólio</p>
-  <h2 class="h2 rv">Energia em escala.</h2>
-  <p class="lead rv">Quando o projeto cresce, a responsabilidade também.</p>
+<section class="sec sheet dark2" id="portfolio" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Portfólio</p>
+    <h2 class="h2 rv">Energia em escala.</h2>
+    <p class="lead rv">Quando o projeto cresce, a responsabilidade também.</p>
 
-  <div class="escala rv">
-    <div class="tot"><b><Num value={Math.round(totalMWp * 1000) / 1000} dec={3} /><small>MWp</small></b><span>somados nas 4 grandes usinas entregues em destaque</span></div>
-    <ul class="hbars">
-      {USINAS.map((u, i) => (
-        <li style={`--i:${i}`}><b>{u.nome}</b><span class="tr"><i style={`--v:${(u.mwp / maxMWp).toFixed(3)}`}></i></span><em><Num value={u.mwp} /> MWp</em></li>
+    <div class="escala rv">
+      <div class="tot"><b><Num value={Math.round(totalMWp * 1000) / 1000} dec={3} /><small>MWp</small></b><span>somados nas 4 grandes usinas entregues em destaque</span></div>
+      <ul class="hbars">
+        {USINAS.map((u, i) => (
+          <li style={`--i:${i}`}><b>{u.nome}</b><span class="tr"><i style={`--v:${(u.mwp / maxMWp).toFixed(3)}`}></i></span><em><Num value={u.mwp} /> MWp</em></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="pilha" data-pilha>
+      {USINAS.filter((u) => u.foto).map((u, i) => (
+        <article class="pcard gp" style={`--i:${i}`}>
+          <div class="foto"><Img src={u.foto!} alt={`Vista aérea da ${u.nome}`} widths={[768, 1200, 1500]} sizes="(max-width:1240px) 100vw, 1130px" /></div>
+          <div class="band"><div class="pot"><Num value={u.mwp} /><small>MWp</small></div><div class="nm"><b>{u.nome}</b><span>{u.cidade}</span><small>{u.tipo}</small></div></div>
+        </article>
       ))}
-    </ul>
-  </div>
-
-  <div class="gps">
-    {USINAS.filter((u) => u.foto).map((u) => (
-      <article class="gp rv">
-        <div class="foto rv-img"><Img src={u.foto!} alt={`Vista aérea da ${u.nome}`} widths={[768, 1200, 1500]} sizes="(max-width:1240px) 100vw, 1130px" /></div>
-        <div class="band"><div class="pot"><Num value={u.mwp} /><small>MWp</small></div><div class="nm"><b>{u.nome}</b><span>{u.cidade}</span><small>{u.tipo}</small></div></div>
+      <article class="pcard gp video" style="--i:2">
+        <div class="inf">
+          <div><p class="kick">Grandes projetos</p><h3>UFV Gauna</h3><p class="loc">Nova Esperança, PR</p><p class="lead" style="font-size:17px">Usina fotovoltaica em solo</p></div>
+          <div class="band"><div class="pot"><Num value={1.47} /><small>MWp</small></div></div>
+        </div>
+        <Video video="ufv-gauna" poster="portfolio/gauna-poster" />
       </article>
-    ))}
-    <article class="gp video rv">
-      <div class="inf">
-        <div><p class="kick">Grandes projetos</p><h3>UFV Gauna</h3><p class="loc">Nova Esperança, PR</p><p class="lead" style="font-size:17px">Usina fotovoltaica em solo</p></div>
-        <div class="band"><div class="pot"><Num value={1.47} /><small>MWp</small></div></div>
-      </div>
-      <Video video="ufv-gauna" poster="portfolio/gauna-poster" />
-    </article>
-    <article class="gp rv">
-      <div class="mos">{[1, 2, 3, 4, 5, 6].map((i) => <div class="ph-img"><Img src={`portfolio/palmeira-${i}`} alt="UFV Palmeira I" widths={[320]} sizes="(max-width:700px) 33vw, 17vw" /></div>)}</div>
-      <div class="band"><div class="pot"><Num value={1.339} /><small>MWp</small></div><div class="nm"><b>UFV Palmeira I</b><span>Palmeira - PR</span><small>Cliente: Município de Palmeira. Empreitada global, contratação por licitação</small></div></div>
-    </article>
+      <article class="pcard gp" style="--i:3">
+        <div class="mos">{[1, 2, 3, 4, 5, 6].map((i) => <div class="ph-img"><Img src={`portfolio/palmeira-${i}`} alt="UFV Palmeira I" widths={[320]} sizes="(max-width:700px) 33vw, 17vw" /></div>)}</div>
+        <div class="band"><div class="pot"><Num value={1.339} /><small>MWp</small></div><div class="nm"><b>UFV Palmeira I</b><span>Palmeira - PR</span><small>Cliente: Município de Palmeira. Empreitada global, contratação por licitação</small></div></div>
+      </article>
+    </div>
+
     <div class="entrega">
       <div class="rv"><h3 class="h3">Entregue e documentada.</h3><p class="lead" style="font-size:16px;margin-top:10px">Registro técnico da entrega da UFV Palmeira I ao Município de Palmeira.</p>
         <div class="fx" style="margin-top:18px">
@@ -213,146 +234,160 @@ const filtros = [['todos', 'Todos'], ['industria', 'Indústria'], ['agro', 'Agro
       <div class="eg">{entrega.map(([f, t], i) => <div class="ph-img rv-img" style={`--i:${i}`}><Img src={`entrega/${f}`} alt={t} widths={[320]} sizes="(max-width:520px) 50vw, (max-width:900px) 33vw, 15vw" /><span class="t">{t}</span></div>)}</div>
     </div>
   </div>
-</div></section>
+</section>
 
-<section class="sec dark2" id="usinas"><div class="wrap">
-  <p class="kick rv">Usinas</p>
-  <h2 class="h2 rv">Usinas executadas pela equipe.</h2>
-  <div class="gal">
-    {Array.from({ length: 11 }, (_, i) => (
-      <div class="ph-img rv-img" style={`--i:${i % 4}`}><Img src={`usinas/usina-${String(i + 1).padStart(2, '0')}`} alt="Usina solar executada pela SW Solar" widths={i === 0 ? [600, 900] : [480]} sizes={i === 0 ? '(max-width:760px) 100vw, 66vw' : '(max-width:760px) 50vw, 33vw'} /></div>
-    ))}
-  </div>
-</div></section>
-
-<section class="sec light" id="obras"><div class="wrap">
-  <p class="kick rv">Médio porte</p>
-  <h2 class="h2 rv">Indústria, comércio e agronegócio.</h2>
-  <div class="medio">
-    {DESTAQUES.map((o, i) => (
-      <article class="rv" style={`--i:${i % 3}`}><div class="ph-img"><Img src={o.foto} alt={o.nome} sizes="(max-width:900px) 100vw, 33vw" /></div><div class="inf"><div><b>{o.nome}</b><span>{o.local}. {o.tipo}</span></div><em><Num value={o.kwp} /><small>kWp</small></em></div></article>
-    ))}
-  </div>
-  <h3 class="h3 rv" style="margin-top:64px">Diversidade de portfólio</h3>
-  <div class="filtros" role="group" aria-label="Filtrar obras por segmento">
-    {filtros.map(([id, t], i) => <button type="button" data-f={id} aria-pressed={i === 0 ? 'true' : 'false'}>{t}</button>)}
-  </div>
-  <div class="mos4" id="mos4">
-    {OBRAS.map((o, i) => (
-      <div class="it rv" style={`--i:${i % 4}`} data-seg={o.seg}><div class="ph-img"><Img src={o.foto} alt={o.nome} widths={[400, 700]} sizes="(max-width:900px) 50vw, 25vw" /><span class="badge">{fmt(o.kwp, decs(o.kwp))} kWp</span></div><b>{o.nome}</b><span>{o.local}</span></div>
-    ))}
-  </div>
-</div></section>
-
-<section class="sec" id="mapa"><div class="wrap mapa">
-  <div>
-    <p class="kick rv">Atuação</p>
-    <h2 class="h2 rv">Paraná e Santa Catarina.</h2>
-    <p class="lead rv">Atendemos os dois estados a partir de 4 unidades no Paraná, com a maior concentração de projetos nos Campos Gerais.</p>
-    <div class="nums4 rv">
-      <div><b><Num value={NUMEROS.projetos} prefix="+" /></b><span>projetos instalados</span></div>
-      <div><b><Num value={NUMEROS.modulos} prefix="+" /></b><span>módulos instalados</span></div>
-      <div><b><Num value={NUMEROS.cidades} /></b><span>cidades atendidas, aproximadamente</span></div>
-      <div><b><Num value={NUMEROS.unidades} /></b><span>unidades</span></div>
-    </div>
-    <div class="leg rv">
-      <div><svg aria-hidden="true" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="#ffa04d" /></svg>Projetos instalados</div>
-      <div><svg aria-hidden="true" viewBox="0 0 18 18"><rect x="4" y="4" width="10" height="10" fill="#0a1f38" stroke="#ff7a00" stroke-width="2.5" transform="rotate(45 9 9)" /></svg>Matriz e unidades SW Solar</div>
+<section class="sec sheet" id="usinas" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Usinas</p>
+    <h2 class="h2 rv">Usinas executadas pela equipe.</h2>
+    <div class="gal">
+      {Array.from({ length: 11 }, (_, i) => (
+        <div class="ph-img rv-img" style={`--i:${i % 4}`}><Img src={`usinas/usina-${String(i + 1).padStart(2, '0')}`} alt="Usina solar executada pela SW Solar" widths={i === 0 ? [600, 900] : [480]} sizes={i === 0 ? '(max-width:760px) 100vw, 66vw' : '(max-width:760px) 50vw, 33vw'} /></div>
+      ))}
     </div>
   </div>
-  <figure class="mapbox">
-    <div class="holder" id="mapHolder" data-src="/mapa-atuacao.svg" role="img" aria-label="Mapa do Paraná e de Santa Catarina com a distribuição dos projetos da SW Solar e as unidades em Ponta Grossa, Palmeira, Imbituva e Guarapuava">
-      <noscript><img src="/mapa-atuacao.svg" alt="Mapa de atuação da SW Solar no Paraná e em Santa Catarina" width="1000" height="1136" /></noscript>
+</section>
+
+<section class="sec sheet light" id="obras" data-prog="enter" data-theme="light">
+  <div class="wrap">
+    <p class="kick rv">Médio porte</p>
+    <h2 class="h2 rv">Indústria, comércio e agronegócio.</h2>
+    <div class="medio">
+      {DESTAQUES.map((o, i) => (
+        <article class="rv" style={`--i:${i % 3}`}><div class="ph-img" data-tilt="7"><Img src={o.foto} alt={o.nome} sizes="(max-width:900px) 100vw, 33vw" /><span class="tilt-luz" aria-hidden="true"></span></div><div class="inf"><div><b>{o.nome}</b><span>{o.local}. {o.tipo}</span></div><em><Num value={o.kwp} /><small>kWp</small></em></div></article>
+      ))}
     </div>
-    <figcaption>Representação ilustrativa da distribuição dos projetos.</figcaption>
-  </figure>
-</div></section>
-
-<section class="sec dark2" id="clientes"><div class="wrap">
-  <p class="kick rv">Clientes</p>
-  <h2 class="h2 rv">Quem comprou conta melhor.</h2>
-  <p class="lead rv">Depoimentos de clientes atendidos pela SW Solar.</p>
-  <div class="deps">
-    {DEPOIMENTOS.map((d, i) => <Video class="rv" video={d.video} poster={d.foto} nome={d.nome} sub={d.sub} />)}
+    <h3 class="h3 rv" style="margin-top:64px">Diversidade de portfólio</h3>
+    <div class="filtros" role="group" aria-label="Filtrar obras por segmento">
+      {filtros.map(([id, t], i) => <button type="button" data-f={id} aria-pressed={i === 0 ? 'true' : 'false'}>{t}</button>)}
+    </div>
+    <div class="mos4" id="mos4">
+      {OBRAS.map((o, i) => (
+        <div class="it rv" style={`--i:${i % 4}`} data-seg={o.seg}><div class="ph-img"><Img src={o.foto} alt={o.nome} widths={[400, 700]} sizes="(max-width:900px) 50vw, 25vw" /><span class="badge">{fmt(o.kwp, decs(o.kwp))} kWp</span></div><b>{o.nome}</b><span>{o.local}</span></div>
+      ))}
+    </div>
   </div>
-  <h3 class="h3 rv" style="margin-top:72px">Quem já escolheu a SW Solar.</h3>
-  <p class="lead rv" style="font-size:17px;margin-top:10px">Famílias, produtores rurais e empresas que já fecharam com a SW Solar.</p>
-  <div class="cli">
-    {Array.from({ length: 15 }, (_, i) => (
-      <div class="ph-img rv-img" style={`--i:${i % 8}`}><Img src={`clientes/cliente-${String(i + 1).padStart(2, '0')}`} alt="Cliente SW Solar com o projeto em mãos" widths={[300, 600]} sizes="(max-width:520px) 33vw, (max-width:1000px) 25vw, 12vw" /></div>
-    ))}
-  </div>
-</div></section>
+</section>
 
-<section class="sec" id="pos-venda"><div class="wrap">
-  <div class="mon">
+<section class="sec sheet" id="mapa" data-prog="enter">
+  <div class="wrap mapa">
     <div>
-      <p class="kick rv">Pós-venda</p>
-      <h2 class="h2 rv">Nossa entrega não termina quando o sistema é ligado.</h2>
+      <p class="kick rv">Atuação</p>
+      <h2 class="h2 rv">Paraná e Santa Catarina.</h2>
+      <p class="lead rv">Atendemos os dois estados a partir de 4 unidades no Paraná, com a maior concentração de projetos nos Campos Gerais.</p>
+      <div class="nums4 rv">
+        <div><b><Num value={NUMEROS.projetos} prefix="+" /></b><span>projetos instalados</span></div>
+        <div><b><Num value={NUMEROS.modulos} prefix="+" /></b><span>módulos instalados</span></div>
+        <div><b><Num value={NUMEROS.cidades} /></b><span>cidades atendidas, aproximadamente</span></div>
+        <div><b><Num value={NUMEROS.unidades} /></b><span>unidades</span></div>
+      </div>
+      <div class="leg rv">
+        <div><svg aria-hidden="true" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="#ffa04d" /></svg>Projetos instalados</div>
+        <div><svg aria-hidden="true" viewBox="0 0 18 18"><rect x="4" y="4" width="10" height="10" fill="#0a1f38" stroke="#ff7a00" stroke-width="2.5" transform="rotate(45 9 9)" /></svg>Matriz e unidades SW Solar</div>
+      </div>
+    </div>
+    <figure class="mapbox" data-prog="enter">
+      <div class="holder" id="mapHolder" data-src="/mapa-atuacao.svg" role="img" aria-label="Mapa do Paraná e de Santa Catarina com a distribuição dos projetos da SW Solar e as unidades em Ponta Grossa, Palmeira, Imbituva e Guarapuava">
+        <noscript><img src="/mapa-atuacao.svg" alt="Mapa de atuação da SW Solar no Paraná e em Santa Catarina" width="1000" height="1136" /></noscript>
+      </div>
+      <figcaption>Representação ilustrativa da distribuição dos projetos.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<Depoimentos />
+
+<section class="sec sheet" id="pos-venda" data-prog="enter">
+  <div class="wrap">
+    <div class="mon">
+      <div>
+        <p class="kick rv">Pós-venda</p>
+        <h2 class="h2 rv">Nossa entrega não termina quando o sistema é ligado.</h2>
+        <div class="lista">
+          {[['Monitoramento', 'Geração acompanhada em aplicativo'], ['Performance', 'Comparação com o esperado'], ['Alertas', 'Desvios identificados cedo'], ['Suporte', 'Atendimento ao cliente'], ['Manutenção', 'Correção em campo'], ['O&M', 'Contrato de operação']].map(([b, s], i) => <div class="rv" style={`--i:${i}`}>{b}<span>{s}</span></div>)}
+        </div>
+      </div>
+      <Monitor />
+    </div>
+  </div>
+</section>
+
+<section class="sec sheet light" id="oem" data-prog="enter" data-theme="light">
+  <div class="wrap oem">
+    <div>
+      <p class="kick rv">Operação e manutenção</p>
+      <h2 class="h2 rv">A experiência da SW continua depois da obra.</h2>
       <div class="lista">
-        {[['Monitoramento', 'Geração acompanhada em aplicativo'], ['Performance', 'Comparação com o esperado'], ['Alertas', 'Desvios identificados cedo'], ['Suporte', 'Atendimento ao cliente'], ['Manutenção', 'Correção em campo'], ['O&M', 'Contrato de operação']].map(([b, s], i) => <div class="rv" style={`--i:${i}`}>{b}<span>{s}</span></div>)}
+        {[['Preventiva', 'Rotina programada'], ['Corretiva', 'Atendimento em campo'], ['Inspeções', 'Verificação periódica'], ['Limpeza', 'Módulos e área'], ['Roçagem', 'Usinas em solo'], ['Testes', 'Medições elétricas'], ['Retrofit', 'Atualização de sistemas'], ['Inversores', 'Manutenção e troca'], ['Performance', 'Análise de geração']].map(([b, s], i) => <div class="rv" style={`--i:${i % 3}`}>{b}<span>{s}</span></div>)}
       </div>
     </div>
-    <Monitor />
+    <div class="ph-img rv-img" data-tilt="6"><Img src="oem/usina" alt="Usina em operação" sizes="(max-width:900px) 100vw, 50vw" /><span class="tilt-luz" aria-hidden="true"></span></div>
   </div>
-</div></section>
+</section>
 
-<section class="sec light" id="oem"><div class="wrap oem">
-  <div>
-    <p class="kick rv">Operação e manutenção</p>
-    <h2 class="h2 rv">A experiência da SW continua depois da obra.</h2>
-    <div class="lista">
-      {[['Preventiva', 'Rotina programada'], ['Corretiva', 'Atendimento em campo'], ['Inspeções', 'Verificação periódica'], ['Limpeza', 'Módulos e área'], ['Roçagem', 'Usinas em solo'], ['Testes', 'Medições elétricas'], ['Retrofit', 'Atualização de sistemas'], ['Inversores', 'Manutenção e troca'], ['Performance', 'Análise de geração']].map(([b, s], i) => <div class="rv" style={`--i:${i % 3}`}>{b}<span>{s}</span></div>)}
+<section class="sec sheet dark2" id="grupo" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Grupo</p>
+    <h2 class="h2 rv">Um ecossistema de soluções.</h2>
+    <div class="dup">
+      <div class="rv"><div class="emp sw" data-tilt="5"><div class="nm"><Img src="logo/sw-branco" alt="SW Solar" widths={[500]} sizes="320px" /></div><p>Engenharia, construção e operação de sistemas de energia.</p><ul><li>Engenharia</li><li>Construção</li><li>Solar</li><li>O&amp;M</li><li>Monitoramento</li></ul><span class="tilt-luz" aria-hidden="true"></span></div></div>
+      <div class="plus" aria-hidden="true">+</div>
+      <div class="rv" style="--i:2"><div class="emp copar" data-tilt="5"><div class="nm"><Img src="logo/copar" alt="COPAR Energia" widths={[400]} sizes="240px" /></div><p>Estruturas de investimento em geração solar.</p><ul><li>Geração compartilhada</li><li>Gestão de créditos de energia</li></ul><span class="tilt-luz" aria-hidden="true"></span></div></div>
     </div>
   </div>
-  <div class="ph-img rv-img"><Img src="oem/usina" alt="Usina em operação" sizes="(max-width:900px) 100vw, 50vw" /></div>
-</div></section>
+</section>
 
-<section class="sec" id="grupo"><div class="wrap">
-  <p class="kick rv">Grupo</p>
-  <h2 class="h2 rv">Um ecossistema de soluções.</h2>
-  <div class="dup">
-    <div class="emp sw rv"><div class="nm"><Img src="logo/sw-branco" alt="SW Solar" widths={[500]} sizes="320px" /></div><p>Engenharia, construção e operação de sistemas de energia.</p><ul><li>Engenharia</li><li>Construção</li><li>Solar</li><li>O&amp;M</li><li>Monitoramento</li></ul></div>
-    <div class="plus" aria-hidden="true">+</div>
-    <div class="emp copar rv" style="--i:2"><div class="nm"><Img src="logo/copar" alt="COPAR Energia" widths={[400]} sizes="240px" /></div><p>Estruturas de investimento em geração solar.</p><ul><li>Geração compartilhada</li><li>Gestão de créditos de energia</li></ul></div>
+<section class="sec sheet light" id="unidades" data-prog="enter" data-theme="light">
+  <div class="wrap">
+    <p class="kick rv">Unidades</p>
+    <h2 class="h2 rv">Perto de quem atendemos.</h2>
+    <div class="unis">
+      {UNIDADES.map((u, i) => (
+        <div class="uni rv" style={`--i:${i}`}>
+          <div class="ph-img" data-tilt="7"><Img src={u.foto} alt={`Unidade SW Solar em ${u.cidade}`} widths={[400, 700]} sizes="(max-width:900px) 50vw, 25vw" pos={u.pos} /><span class="tilt-luz" aria-hidden="true"></span></div>
+          <span class="pp">{u.papel}</span><b>{u.cidade}, {u.uf}</b><span>{u.end}</span>
+          <a href={`https://wa.me/${u.whats}`} target="_blank" rel="noopener">{u.tel}</a>
+          <a class="rota" href={mapa(u)} target="_blank" rel="noopener">Como chegar ↗</a>
+        </div>
+      ))}
+    </div>
   </div>
-</div></section>
+</section>
 
-<section class="sec light" id="unidades"><div class="wrap">
-  <p class="kick rv">Unidades</p>
-  <h2 class="h2 rv">Perto de quem atendemos.</h2>
-  <div class="unis">
-    {UNIDADES.map((u, i) => (
-      <div class="uni rv" style={`--i:${i}`}>
-        <div class="ph-img"><Img src={u.foto} alt={`Unidade SW Solar em ${u.cidade}`} widths={[400, 700]} sizes="(max-width:900px) 50vw, 25vw" pos={u.pos} /></div>
-        <span class="pp">{u.papel}</span><b>{u.cidade}, {u.uf}</b><span>{u.end}</span>
-        <a href={`https://wa.me/${u.whats}`} target="_blank" rel="noopener">{u.tel}</a>
-      </div>
-    ))}
+<section class="sec sheet" id="posicionamento" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">SW Solar</p>
+    <h2 class="h2 acende" data-prog="janela" style={`max-width:22ch;--n:${frase.length}`} aria-label={frase.join(' ')}>
+      <span aria-hidden="true">{frase.map((w, i) => <><span class="w2" style={`--i:${i}`}>{w}</span>{' '}</>)}</span>
+    </h2>
+    <div class="pairs">
+      {[['Do estudo', 'à conexão.'], ['Da engenharia', 'à execução.'], ['Da instalação', 'à operação.'], ['Do pequeno projeto', 'às usinas de grande porte.']].map(([a, b], i) => <div class="rv" style={`--i:${i}`}>{a}<span>{b}</span></div>)}
+    </div>
   </div>
-</div></section>
+</section>
 
-<section class="sec" id="posicionamento"><div class="wrap">
-  <p class="kick rv">SW Solar</p>
-  <h2 class="h2 rv" style="max-width:22ch">Uma empresa de engenharia e soluções em energia.</h2>
-  <div class="pairs">
-    {[['Do estudo', 'à conexão.'], ['Da engenharia', 'à execução.'], ['Da instalação', 'à operação.'], ['Do pequeno projeto', 'às usinas de grande porte.']].map(([a, b], i) => <div class="rv" style={`--i:${i}`}>{a}<span>{b}</span></div>)}
-  </div>
-</div></section>
+<Faq />
 
-<section class="sec cta" id="contato"><div class="wrap in">
-  <Split tag="h2" text="Vamos conversar sobre o seu projeto." />
-  <div class="rv" style="display:flex;flex-wrap:wrap;gap:12px;--i:3">
-    <a class="btn pri" href={wa} target="_blank" rel="noopener">Chamar no WhatsApp</a>
-    <a class="btn sec" href={`https://instagram.com/${CONTATO.insta}`} target="_blank" rel="noopener">@{CONTATO.insta}</a>
+<section class="sec sheet cta" id="contato" data-prog="enter">
+  <canvas class="esfera" data-cor="255,240,220" aria-hidden="true"></canvas>
+  <div class="wrap in">
+    <Split tag="h2" text="Vamos conversar sobre o seu projeto." />
+    <div class="rv" style="display:flex;flex-wrap:wrap;gap:12px;--i:3">
+      <a class="btn pri" href={wa} target="_blank" rel="noopener">Chamar no WhatsApp <i aria-hidden="true">→</i></a>
+      <a class="btn sec" href={`https://instagram.com/${CONTATO.insta}`} target="_blank" rel="noopener">@{CONTATO.insta}</a>
+    </div>
   </div>
-</div></section>
+</section>
 </main>
 
-<footer><div class="wrap in">
-  <div><Img src="logo/sw-branco" alt="SW Solar" widths={[300]} sizes="250px" /><b>{CONTATO.razao}</b><br />Matriz: {UNIDADES[0].end}, {UNIDADES[0].cidade}/{UNIDADES[0].uf}</div>
-  <div><b>Unidades</b><br />{UNIDADES.map((u) => u.cidade).join(', ').replace(/, ([^,]*)$/, ' e $1')}</div>
-  <div><b>Contato</b><br /><a href={`https://${CONTATO.site}`}>{CONTATO.site}</a> | {UNIDADES[0].tel}</div>
+<footer><div class="wrap">
+  <div class="cols">
+    <div><Img src="logo/sw-branco" alt="SW Solar" widths={[300]} sizes="220px" /><b>{CONTATO.razao}</b><br />Matriz: {UNIDADES[0].end}, {UNIDADES[0].cidade}/{UNIDADES[0].uf}</div>
+    <div><b>Navegação</b><ul>{nav.map(([id, t]) => <li><a href={`#${id}`}>{t}</a></li>)}</ul></div>
+    <div><b>Unidades</b><ul>{UNIDADES.map((u) => <li><a href={`https://wa.me/${u.whats}`} target="_blank" rel="noopener">{u.cidade}, {u.uf}</a></li>)}</ul></div>
+    <div><b>Contato</b><ul><li><a href={`https://${CONTATO.site}`}>{CONTATO.site}</a></li><li>{UNIDADES[0].tel}</li><li><a href={`https://instagram.com/${CONTATO.insta}`} target="_blank" rel="noopener">@{CONTATO.insta}</a></li></ul><a class="btn pri" href={wa} target="_blank" rel="noopener">Falar no WhatsApp</a></div>
+  </div>
+  <div class="fim"><span>© {new Date().getFullYear()} {CONTATO.razao}</span><span>Paraná e Santa Catarina</span></div>
 </div></footer>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Visualizador de fotos SW Solar" hidden>
@@ -367,5 +402,8 @@ const filtros = [['todos', 'Todos'], ['industria', 'Indústria'], ['agro', 'Agro
 
 <script>
   import '../scripts/main';
+  import '../scripts/motion';
+  import '../scripts/scenes';
+  import '../scripts/esfera';
 </script>
 </Base>

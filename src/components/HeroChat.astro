@@ -1,0 +1,45 @@
+---
+import { simular } from '../lib/simular';
+import { CIDADES } from '../data/simulador';
+import { fmt } from '../data/site';
+
+/* Conversa de exemplo no topo. Os números saem do próprio simulador
+   (conta de R$ 500, residência bifásica em Ponta Grossa), então batem
+   com o que o visitante vê ao simular os mesmos dados. */
+const cidade = CIDADES.findIndex((c) => c.cidade === 'Ponta Grossa');
+const r = simular({ cidade, ligacao: 'bi', perfil: 'res', modo: 'reais', valor: 500, anoInicio: 2027 });
+const kwp = fmt(r.kwp, 2);
+const econ = fmt(Math.round(r.economiaMes));
+const pay = r.payback ? fmt(r.payback, 1) : '';
+const pct = Math.round(r.economiaPct * 100);
+---
+<div class="phone-x" aria-hidden="true" data-tilt="6">
+  <div class="px-ilha"></div>
+  <div class="px-tela">
+    <div class="px-topo">
+      <span class="px-voltar">‹</span>
+      <img class="px-avatar" src="/favicon.png" alt="" width="34" height="34" />
+      <div><b>SW Solar</b><small>online</small></div>
+    </div>
+    <div class="px-conversa" id="heroChat" data-loop="17500">
+      <div class="px-dia"><span>HOJE</span></div>
+      <div class="msg out" data-at="400"><div><div class="b"><p>Oi! Vim pelo site. Minha conta de luz é R$ 500 por mês, em Ponta Grossa.</p><time>09:41 <i>✓✓</i></time></div></div></div>
+      <div class="msg in typing" data-at="1500" data-ate="3100"><div><div class="b"><p><span></span><span></span><span></span></p></div></div></div>
+      <div class="msg in" data-at="3100"><div><div class="b"><p>Oi! Rodei o simulador com a tarifa da Copel e o sol de Ponta Grossa ☀️</p><time>09:42</time></div></div></div>
+      <div class="msg in typing" data-at="4100" data-ate="5700"><div><div class="b"><p><span></span><span></span><span></span></p></div></div></div>
+      <div class="msg in" data-at="5700"><div><div class="b px-card">
+        <small>Simulação SW Solar</small>
+        <div class="px-linha"><span>Sistema</span><b>{kwp} kWp</b></div>
+        <div class="px-linha"><span>Economia</span><b class="or">R$ {econ}/mês</b></div>
+        <div class="px-barra"><i style={`--v:${pct / 100}`}></i></div>
+        <div class="px-linha"><span>Conta</span><b>{pct}% menor</b></div>
+        {pay && <div class="px-linha"><span>Retorno</span><b>{pay} anos</b></div>}
+        <time>09:42</time>
+      </div></div></div>
+      <div class="msg in" data-at="7600"><div><div class="b"><p>Quer que a engenharia faça o estudo com a sua fatura?</p><time>09:42</time></div></div></div>
+      <div class="msg out" data-at="9300"><div><div class="b"><p>Quero! 🙌</p><time>09:43 <i>✓✓</i></time></div></div></div>
+    </div>
+    <div class="px-digitar"><span>Mensagem</span><i></i></div>
+  </div>
+  <span class="tilt-luz"></span>
+</div>

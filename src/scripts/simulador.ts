@@ -160,12 +160,29 @@ if (form) {
   range.value = String(paraRange(Number(valor.value)));
   desenhar(false);
 
-  // Primeira vez que os gráficos aparecem: barras sobem e a linha se desenha.
-  const io = new IntersectionObserver((es) => {
+  // Primeira vez que o simulador aparece: o valor é "digitado", as barras
+  // sobem e a linha do retorno se desenha.
+  const digitar = (texto: string) => new Promise<void>((fim) => {
+    form.classList.add('digitando');
+    valor.value = '';
+    let i = 0;
+    const passo = () => {
+      i++;
+      valor.value = texto.slice(0, i);
+      range.value = String(paraRange(Number(valor.value) || MIN));
+      desenhar(false);
+      if (i < texto.length) setTimeout(passo, 170);
+      else { form.classList.remove('digitando'); fim(); }
+    };
+    setTimeout(passo, 350);
+  });
+  const io = new IntersectionObserver(async (es) => {
     if (!es.some((x) => x.isIntersecting)) return;
-    visto = true; io.disconnect();
+    io.disconnect();
+    if (motion) await digitar(valor.value || '500');
+    visto = true;
     bars.forEach((b) => (b.style.transform = `scaleY(${b.dataset.v})`));
     desenhar(true);
-  }, { threshold: 0.3 });
-  io.observe($('#cGer'));
+  }, { threshold: 0.35 });
+  io.observe(form);
 }

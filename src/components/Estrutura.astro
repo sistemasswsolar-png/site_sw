@@ -1,0 +1,44 @@
+---
+import Img from './Img.astro';
+import Split from './Split.astro';
+
+/* Palco fixo: no computador a seção "gruda" na tela por três telas de
+   rolagem e troca Estoque → Logística → Equipe (data-ato, escrito pelo
+   motor de rolagem). No celular vira lista normal. */
+const atos = [
+  { n: '01', t: 'Estoque próprio.', s: 'Equipamentos disponíveis antes de a obra começar.', foto: 'estrutura/estoque', alt: 'Estoque de equipamentos SW Solar' },
+  { n: '02', t: 'Logística própria.', s: 'Do nosso estoque até o canteiro, com transporte próprio.', foto: 'estrutura/logistica', alt: 'Caminhão da frota SW Solar em obra de usina em solo', pos: '30% 50%' },
+  { n: '03', t: 'Equipe própria de instalação.', s: 'Quem instala é quem responde pela instalação.', foto: 'estrutura/equipe', alt: 'Equipe de instalação SW Solar com EPI em telhado comercial', pos: '50% 62%' },
+];
+---
+<section class="sheet pin-sec estr" id="estrutura" data-prog="enter">
+  <div class="pin-trilho" data-prog="pin" data-atos="3" data-ato="1">
+    <div class="pin-palco">
+      <div class="bg"><Img src="estrutura/fundo" alt="" widths={[480]} /></div>
+      <div class="wrap estr-grid">
+        <div class="estr-txt">
+          <p class="kick rv">Estrutura</p>
+          <Split tag="p" class="frase" text="Não é apenas sobre gerar energia." destaque="É sobre ter estrutura para entregar." />
+          <ol class="atos rv" style="--i:2">
+            {atos.map((a, i) => (
+              <li class="ato" data-n={i + 1}>
+                <span class="ato-n">{a.n}</span>
+                <div><b>{a.t}</b><span>{a.s}</span></div>
+                <i class="ato-fio" aria-hidden="true"></i>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div class="estr-fotos" aria-hidden="true">
+          {atos.map((a, i) => (
+            <figure class="efoto" data-n={i + 1}>
+              <Img src={a.foto} alt={a.alt} sizes="(max-width:900px) 100vw, 45vw" pos={a.pos} />
+              <figcaption><span>{a.n}</span>{a.t}</figcaption>
+            </figure>
+          ))}
+          <div class="estr-cont"><b class="estr-num">0<span></span></b><small>/ 03</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

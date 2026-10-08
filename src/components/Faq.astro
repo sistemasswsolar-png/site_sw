@@ -1,0 +1,42 @@
+---
+import { waLink } from '../data/site';
+
+/* Respostas tiradas da apresentação comercial da SW e das regras públicas
+   (Lei 14.300/2022 e ANEEL). Nada de prazo, preço ou garantia aqui:
+   isso sai na proposta. */
+const perguntas = [
+  ['A SW atende a minha cidade?', 'Atendemos o Paraná e Santa Catarina a partir de 4 unidades: Ponta Grossa (matriz), Palmeira, Guarapuava e Imbituva. São cerca de 80 cidades atendidas, com a maior concentração de projetos nos Campos Gerais.'],
+  ['Que tipo de projeto vocês fazem?', 'Do pequeno projeto às usinas de grande porte: usinas fotovoltaicas em solo, indústria, agronegócio (aviários, armazéns e propriedades), comércio e residências. Também fazemos sistemas híbridos, monitoramento e operação e manutenção.'],
+  ['Quem faz a instalação?', 'Equipe própria: quem instala é quem responde pela instalação. Os equipamentos saem do nosso estoque e chegam à obra com logística própria.'],
+  ['A SW cuida da homologação na concessionária?', 'Sim. A homologação junto à concessionária é uma das etapas que a SW executa, junto com estudo, dimensionamento, projeto, suprimentos, logística, execução, comissionamento, monitoramento e O&M.'],
+  ['O que muda com a Lei 14.300?', 'Para sistemas novos, uma parte do Fio B da distribuidora é cobrada sobre a energia que vai para a rede e volta como crédito: 60% em 2026, 75% em 2027 e 90% em 2028. A energia usada no mesmo instante em que é gerada não entra nessa cobrança. O simulador do site já considera essa regra.'],
+  ['A conta de luz zera?', 'Não. Continuam o valor mínimo de disponibilidade da ligação (30, 50 ou 100 kWh, para monofásica, bifásica ou trifásica), a contribuição de iluminação pública e, para sistemas novos, a parcela do Fio B.'],
+  ['Os créditos de energia vencem?', 'A energia que sobra vira crédito e pode abater as contas dos meses seguintes por até 60 meses.'],
+  ['Como acompanho a geração depois de instalado?', 'Pelo aplicativo de monitoramento. A SW compara a geração com o esperado, identifica desvios cedo e oferece suporte, manutenção em campo e contrato de O&M.'],
+  ['Em quanto tempo o sistema se paga?', 'Depende da conta, da cidade e do tipo de ligação. O simulador do site calcula com as tarifas oficiais da ANEEL e a geração solar da sua cidade; o estudo da SW confirma com a sua fatura.'],
+  ['A SW tem outros serviços de energia?', 'Sim. Pela COPAR Energia, empresa do grupo, há estruturas de investimento em geração solar, com geração compartilhada e gestão de créditos de energia.'],
+];
+const metade = Math.ceil(perguntas.length / 2);
+const colunas = [perguntas.slice(0, metade), perguntas.slice(metade)];
+---
+<section class="sec sheet light faq-sec" id="faq" data-theme="light" data-prog="enter">
+  <div class="wrap">
+    <div class="centro">
+      <p class="kick rv">Dúvidas</p>
+      <h2 class="h2 rv">Perguntas frequentes.</h2>
+      <p class="lead rv">Não achou a sua? A engenharia <a href={waLink('Olá! Tenho uma dúvida sobre energia solar.')} target="_blank" rel="noopener">responde no WhatsApp</a>.</p>
+    </div>
+    <div class="faq">
+      {colunas.map((col, c) => (
+        <div class="faq-col">
+          {col.map(([q, a], i) => (
+            <details class="faq-item rv" style={`--i:${i}`} name="faq">
+              <summary><span>{q}</span><i aria-hidden="true"></i></summary>
+              <div class="faq-resp"><div><p>{a}</p></div></div>
+            </details>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

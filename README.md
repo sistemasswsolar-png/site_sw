@@ -34,4 +34,16 @@ Na Vercel: importar o repositório. O preset Astro é detectado sozinho.
 
 ## Animações
 
-Disparadas ao entrar na tela (IntersectionObserver). Só animam `transform` e `opacity`. Ficam desligadas para quem ativou "reduzir movimento" no sistema. Se o JavaScript falhar, a página aparece completa e sem animação.
+A linguagem segue a referência (meuassessor.com), com as cores e o conteúdo da SW:
+
+- Cabeçalho em pílula de vidro, que fica claro sobre seções claras (`data-theme="light"`).
+- Cada bloco entra como uma "folha" de cantos arredondados sobre o anterior (classe `sheet`).
+- Topo com celular e conversa animada no WhatsApp (`HeroChat.astro`); os números vêm do simulador.
+- Trajetória e depoimentos em formato de stories, avançando sozinhos (`data-story`).
+- Estrutura com palco fixo na rolagem (Estoque → Logística → Equipe), só no computador.
+- Engenharia com foto fixa e trilho de etapas que se preenche.
+- Usinas em cartões que empilham, balões de perguntas em faixas, esfera de partículas no fechamento.
+
+Como funciona: `src/scripts/motion.ts` escreve a variável `--p` (0 a 1) nos elementos com `data-prog`, e o CSS (`src/styles/cinema.css`) transforma isso em movimento. `src/scripts/scenes.ts` cuida dos stories e da conversa; `src/scripts/esfera.ts`, da esfera (canvas, sem biblioteca).
+
+Só animam `transform` e `opacity`, nada roda fora da tela, e tudo desliga para quem ativou "reduzir movimento" no sistema. Se o JavaScript falhar, a página aparece completa e sem animação.

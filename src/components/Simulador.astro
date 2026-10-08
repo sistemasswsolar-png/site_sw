@@ -3,7 +3,7 @@ import { CIDADES, LIGACOES, PERFIS, DISTRIBUIDORAS, PRECO_WP } from '../data/sim
 const grupos = ['PR', 'SC'].map((uf) => ({ uf, nome: uf === 'PR' ? 'Paraná' : 'Santa Catarina', itens: CIDADES.map((c, i) => ({ ...c, i })).filter((c) => c.uf === uf) }));
 const meses = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 ---
-<section class="sec" id="simulador"><div class="wrap">
+<section class="sec sheet" id="simulador" data-prog="enter"><div class="wrap">
   <p class="kick rv">Simulador</p>
   <h2 class="h2 rv">Quanto você economiza com energia solar.</h2>
   <p class="lead rv">Tarifas oficiais da ANEEL, geração solar real da sua cidade e as regras da Lei 14.300. Ajuste os campos e veja o resultado na hora.</p>
@@ -37,7 +37,8 @@ const meses = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
       </fieldset>
     </form>
 
-    <div class="res" aria-live="polite">
+    <div class="res janela" aria-live="polite">
+      <div class="janela-topo" aria-hidden="true"><i></i><i></i><i></i><span>swsolar.com.br/simulador</span></div>
       <div class="kpis rv">
         <div class="kpi hl"><b>R$ <span id="rEcon">0</span></b><span>de economia por mês</span></div>
         <div class="kpi"><b><span id="rPct">0</span><small>%</small></b><span>a menos na conta</span></div>

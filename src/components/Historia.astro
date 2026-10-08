@@ -1,0 +1,84 @@
+---
+import Img from './Img.astro';
+import Num from './Num.astro';
+import { NUMEROS, fmt } from '../data/site';
+
+/* Trajetória em "stories": um palco que avança sozinho. A lista aponta o
+   marco ativo (com barra de progresso) e a cena correspondente acende,
+   com as notificações entrando por CSS. */
+const marcos = [
+  {
+    t: 'Começamos com um propósito.', s: 'Soluções completas em energia solar, com responsabilidade ambiental.',
+    foto: 'quem-somos/matriz', pos: '50% 40%', alt: 'Fachada da matriz da SW Solar em Ponta Grossa',
+    notas: [{ t: 'Matriz em Ponta Grossa', s: 'R. Ermelino de Leão, 1251' }],
+  },
+  {
+    t: 'Crescemos com nossos clientes.', s: 'Famílias, produtores rurais e empresas.',
+    foto: 'clientes/cliente-05', pos: '50% 30%', alt: 'Cliente SW Solar com o projeto em mãos',
+    notas: [{ t: `+${fmt(NUMEROS.projetos)} projetos instalados`, s: 'no Paraná e em Santa Catarina' }],
+  },
+  {
+    t: 'Construímos uma estrutura.', s: 'Estoque, logística e equipes próprias.',
+    foto: 'estrutura/logistica', pos: '30% 50%', alt: 'Caminhão da frota SW Solar em obra',
+    notas: [{ t: 'Estoque próprio', s: 'equipamentos antes da obra' }, { t: 'Logística própria', s: 'do estoque até o canteiro' }],
+  },
+  {
+    t: 'Formamos um time.', s: 'Engenharia, obra, comercial e pós-venda sob o mesmo teto.',
+    foto: 'trajetoria/festa-1', pos: '50% 50%', alt: 'Equipe SW Solar na festa de 5 anos',
+    fotos: ['trajetoria/festa-2', 'trajetoria/festa-4', 'trajetoria/festa-6'],
+  },
+  {
+    t: 'Entregamos grandes projetos.', s: 'Usinas de MWp no Paraná.',
+    foto: 'portfolio/demori', pos: '50% 50%', alt: 'Vista aérea da UFV Demori',
+    notas: [{ t: 'UFV Demori', s: '3,407 MWp · Cruzeiro do Sul, PR' }],
+  },
+  {
+    t: 'E continuamos evoluindo.', s: 'Monitoramento, O&M e gestão de ativos.',
+    foto: 'oem/usina', pos: '50% 50%', alt: 'Usina em operação acompanhada pela SW Solar',
+    notas: [{ t: 'Geração acompanhada', s: 'no aplicativo de monitoramento' }],
+  },
+];
+---
+<section class="sec sheet story-sec" id="trajetoria" data-story data-dur="5200" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Nossa trajetória</p>
+    <h2 class="h2 rv"><Num value={NUMEROS.anos} /> anos.</h2>
+    <div class="story">
+      <ol class="story-list rv" style="--i:1">
+        {marcos.map((m, i) => (
+          <li class="story-item">
+            <button type="button" class="story-btn" aria-label={`${m.t} ${m.s}`}>
+              <span class="story-n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="story-t">{m.t}</span>
+            </button>
+            <div class="story-corpo"><div><p>{m.s}</p></div></div>
+            <span class="story-barra" aria-hidden="true"></span>
+          </li>
+        ))}
+      </ol>
+      <div class="story-palco rv" style="--i:2" aria-hidden="true">
+        {marcos.map((m, i) => (
+          <div class="story-cena">
+            <Img src={m.foto} alt={m.alt} widths={[480, 640, 760, 1100]} sizes="(max-width:900px) 92vw, 46vw" pos={m.pos} />
+            {m.notas && (
+              <div class="notas">
+                {m.notas.map((n, k) => (
+                  <div class="nota" style={`--k:${k}`}>
+                    <i class="nota-ico"><img src="/favicon.png" alt="" width="28" height="28" /></i>
+                    <div><b>{n.t}</b><span>{n.s}</span></div>
+                    <time>agora</time>
+                  </div>
+                ))}
+              </div>
+            )}
+            {m.fotos && (
+              <div class="polaroids">
+                {m.fotos.map((f, k) => <div class="pol" style={`--k:${k}`}><Img src={f} alt="" widths={[300]} sizes="160px" /></div>)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

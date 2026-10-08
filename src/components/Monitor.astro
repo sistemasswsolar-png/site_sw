@@ -5,18 +5,16 @@ import { MONITOR as M } from '../data/site';
 /* Réplica animada da tela do app de monitoramento, com os valores reais da usina SW Solar. */
 ---
 <div class="rv" style="--i:2">
-  <div class="phone" role="img" aria-label={`Aplicativo de monitoramento SW Solar: ${M.semana} kWh na semana, ${M.mes} kWh no mês, ${M.ano} kWh no ano e ${M.co2} toneladas de CO2 evitadas.`}>
+  <div class="tilt-wrap"><div class="phone" data-tilt="7" role="img" aria-label={`Aplicativo de monitoramento SW Solar: ${M.semana} kWh na semana, ${M.mes} kWh no mês, ${M.ano} kWh no ano e ${M.co2} toneladas de CO2 evitadas.`}>
     <div class="scr" aria-hidden="true">
       <div class="top"><Img src="logo/sw-branco" alt="" widths={[200]} sizes="120px" /><i></i></div>
       <div class="ttl"><small>USINA SOLAR</small><b>SW SOLAR</b></div>
       <div class="box">
         <div class="now">
-          <svg class="sun" viewBox="0 0 52 52">
-            <g class="r" stroke="#ffb020" stroke-width="3" stroke-linecap="round">
-              {Array.from({ length: 8 }, (_, i) => <line x1="26" y1="4" x2="26" y2="10" transform={`rotate(${i * 45} 26 26)`} />)}
-            </g>
-            <circle cx="26" cy="26" r="11" fill="#ffc531" />
-          </svg>
+          <div class="arco">
+            <svg viewBox="0 0 120 58"><path class="arco-l" d="M6 52 A54 46 0 0 1 114 52" /><path class="arco-f" pathLength="1" d="M6 52 A54 46 0 0 1 114 52" /></svg>
+            <span class="sol"></span>
+          </div>
           <div><span class="st">AGORA · STATUS</span><div class="ok"><i></i>Ok</div></div>
         </div>
         <div class="g">
@@ -35,6 +33,7 @@ import { MONITOR as M } from '../data/site';
         </div>
       </div>
     </div>
-  </div>
+    <span class="tilt-luz" aria-hidden="true"></span>
+  </div></div>
   <p class="phone-leg">Tela do app de monitoramento SW Solar</p>
 </div>

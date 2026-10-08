@@ -1,0 +1,60 @@
+---
+import Img from './Img.astro';
+import Video from './Video.astro';
+import { DEPOIMENTOS } from '../data/site';
+
+/* Um depoimento por vez, os rostos como abas. Avança sozinho; dar play
+   num vídeo segura o palco até o vídeo parar. Embaixo, duas faixas de
+   fotos de clientes correndo em sentidos opostos. */
+const clientes = Array.from({ length: 15 }, (_, i) => `clientes/cliente-${String(i + 1).padStart(2, '0')}`);
+const filas = [clientes.slice(0, 8), clientes.slice(8)];
+---
+<section class="sec sheet dark2 dep-sec story-sec" id="clientes" data-story data-dur="6500" data-prog="enter">
+  <div class="wrap">
+    <p class="kick rv">Clientes</p>
+    <h2 class="h2 rv">Quem comprou conta melhor.</h2>
+    <p class="lead rv">Depoimentos de clientes atendidos pela SW Solar.</p>
+    <div class="dep">
+      <div class="dep-palco rv">
+        {DEPOIMENTOS.map((d) => (
+          <div class="story-cena dep-cena">
+            <Video video={d.video} poster={d.foto} nome={d.nome} sub={d.sub} />
+          </div>
+        ))}
+      </div>
+      <div class="dep-lado rv" style="--i:2">
+        <ol class="dep-rostos" role="tablist" aria-label="Escolher depoimento">
+          {DEPOIMENTOS.map((d, i) => (
+            <li class="story-item">
+              <button type="button" class="story-btn rosto" role="tab" aria-label={`${d.nome}${d.sub ? ', ' + d.sub : ''}`}>
+                <span class="anel" aria-hidden="true"></span>
+                <span class="rosto-foto"><Img src={d.foto} alt="" widths={[200]} sizes="64px" pos="50% 22%" /></span>
+              </button>
+              <span class="story-barra" aria-hidden="true"></span>
+            </li>
+          ))}
+        </ol>
+        <div class="dep-nomes" aria-live="polite">
+          {DEPOIMENTOS.map((d) => (
+            <div class="story-cena dep-nome"><b>{d.nome}</b>{d.sub && <span>{d.sub}</span>}</div>
+          ))}
+        </div>
+        <p class="dep-dica">Toque no play para ouvir. Os depoimentos trocam sozinhos.</p>
+      </div>
+    </div>
+  </div>
+  <h3 class="h3 wrap rv cli-tit">Quem já escolheu a SW Solar.</h3>
+  <div class="cli-faixas">
+    {filas.map((f, i) => (
+      <div class={`cli-faixa ${i ? 'inv' : ''}`}>
+        {[0, 1].map((k) => (
+          <div class="cli-fila" aria-hidden={k === 1 ? 'true' : undefined}>
+            {f.map((c) => (
+              <div class={`ph-img cli-foto ${k === 1 ? 'dup' : ''}`}><Img src={c} alt="Cliente SW Solar com o projeto em mãos" widths={[300, 600]} sizes="180px" pos="50% 30%" /></div>
+            ))}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>

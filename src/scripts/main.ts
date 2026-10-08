@@ -8,37 +8,40 @@ const $ = <T extends Element = HTMLElement>(s: string, el: ParentNode = document
 const $$ = <T extends Element = HTMLElement>(s: string, el: ParentNode = document) => [...el.querySelectorAll(s)] as T[];
 const fmt = (n: number, d = 0) => n.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
 
-/* ---------- cabeçalho: sólido ao rolar, some ao descer e volta ao subir ---------- */
+/* ---------- cabeçalho de vidro: mais opaco depois do topo ---------- */
 const hdr = $('#hdr');
-const nav = $('#nav');
-let ultimoY = scrollY;
-const onScroll = () => {
-  const y = scrollY;
-  hdr.classList.toggle('solid', y > 40);
-  hdr.classList.toggle('hide', y > 600 && y > ultimoY && !nav.classList.contains('open'));
-  ultimoY = y;
-};
+const mnav = $('#mnav');
+const menu = $('#menu');
+const onScroll = () => hdr.classList.toggle('rolou', scrollY > 40);
 addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-const menu = $('#menu');
-menu.addEventListener('click', () => {
-  const o = nav.classList.toggle('open');
-  menu.setAttribute('aria-expanded', String(o));
-});
-nav.addEventListener('click', (e) => {
-  if ((e.target as HTMLElement).tagName === 'A') { nav.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); }
-});
+/* menu do celular: painel de tela cheia */
+const abreMenu = (abre: boolean) => {
+  hdr.classList.toggle('aberto', abre);
+  mnav.classList.toggle('aberto', abre);
+  menu.setAttribute('aria-expanded', String(abre));
+  menu.setAttribute('aria-label', abre ? 'Fechar menu' : 'Abrir menu');
+};
+menu.addEventListener('click', () => abreMenu(!mnav.classList.contains('aberto')));
+mnav.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) abreMenu(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mnav.classList.contains('aberto')) { abreMenu(false); menu.focus(); } });
+matchMedia('(min-width: 1101px)').addEventListener('change', (e) => { if (e.matches) abreMenu(false); });
 
 /* item do menu da seção visível */
-const links = new Map($$<HTMLAnchorElement>('a', nav).map((a) => [a.hash.slice(1), a]));
+const links = new Map<string, HTMLAnchorElement[]>();
+$$<HTMLAnchorElement>('#nav a, #mnav a').forEach((a) => {
+  const id = a.hash.slice(1); if (!id) return;
+  links.set(id, [...(links.get(id) || []), a]);
+});
 const ioNav = new IntersectionObserver((es) => {
   for (const e of es) if (e.isIntersecting) {
-    links.forEach((a) => a.classList.remove('on'));
-    links.get(e.target.id)?.classList.add('on');
+    links.forEach((as) => as.forEach((a) => a.classList.remove('on')));
+    links.get(e.target.id)?.forEach((a) => a.classList.add('on'));
   }
 }, { rootMargin: '-45% 0px -50% 0px' });
 links.forEach((_, id) => { const s = document.getElementById(id); if (s) ioNav.observe(s); });
+const topo = document.getElementById('inicio'); if (topo) ioNav.observe(topo); // no topo, nenhum item marcado
 
 /* ---------- números que contam ---------- */
 const contar = (el: HTMLElement) => {
@@ -65,9 +68,30 @@ if (motion) {
   const ioR = new IntersectionObserver((es) => es.forEach((e) => {
     if (e.isIntersecting) { e.target.classList.add('in'); ioR.unobserve(e.target); }
   }), { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-  $$('.rv, .rv-img, .words, .traj li, .hbars').forEach((el) => ioR.observe(el));
+  $$('.rv, .rv-img, .words, .hbars, .ps, .sheet-in').forEach((el) => ioR.observe(el));
 } else {
-  $$('.rv, .rv-img, .words, .traj li, .hbars').forEach((el) => el.classList.add('in'));
+  $$('.rv, .rv-img, .words, .hbars, .ps, .sheet-in').forEach((el) => el.classList.add('in'));
+}
+
+/* ---------- engenharia: a etapa que cruza o meio da tela acende ---------- */
+const eng = $('#engenharia');
+if (eng) {
+  const passos = $$('.ps', eng);
+  const atual = $('.eng-atual', eng), faseTxt = $('.eng-fase', eng);
+  const marca = (n: number) => {
+    passos.forEach((p, i) => p.classList.toggle('on', i <= n));
+    const p = passos[n]; if (!p) return;
+    eng.dataset.f = p.dataset.f || '1';
+    if (atual) atual.textContent = String(n + 1).padStart(2, '0');
+    if (faseTxt) faseTxt.textContent = p.dataset.fase || '';
+  };
+  if (motion) {
+    const ioE = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) marca(passos.indexOf(e.target as HTMLElement));
+    }), { rootMargin: '-48% 0px -48% 0px' });
+    passos.forEach((p) => ioE.observe(p));
+  }
+  marca(motion ? 0 : passos.length - 1);
 }
 
 /* ---------- mapa: baixa o SVG só perto da seção ---------- */
@@ -89,15 +113,19 @@ if (holder) {
   ioM.observe(holder);
 }
 
-/* ---------- filtros do portfólio ---------- */
+/* ---------- filtros do portfólio (os cartões deslizam até a nova posição) ---------- */
 const filtros = $$<HTMLButtonElement>('.filtros button');
 filtros.forEach((b) => b.addEventListener('click', () => {
   filtros.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   const f = b.dataset.f;
-  $$('#mos4 .it').forEach((it, i) => {
-    const mostra = f === 'todos' || it.dataset.seg === f;
-    it.hidden = !mostra;
-    if (mostra && motion) it.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: (i % 8) * 40, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+  const its = $$('#mos4 .it');
+  const antes = new Map(its.filter((it) => !it.hidden).map((it) => [it, it.getBoundingClientRect()]));
+  its.forEach((it) => { it.hidden = !(f === 'todos' || it.dataset.seg === f); });
+  if (!motion) return;
+  its.filter((it) => !it.hidden).forEach((it, i) => {
+    const a = antes.get(it), d = it.getBoundingClientRect();
+    if (a) it.animate([{ transform: `translate(${a.left - d.left}px, ${a.top - d.top}px)` }, { transform: 'none' }], { duration: 550, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    else it.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: (i % 8) * 40, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
   });
 }));
 
@@ -138,7 +166,7 @@ if (lb) {
   const grupos = new Map<string, Item[]>();
   $$('main .ph-img, main .gp .foto').forEach((box) => {
     const im = $<HTMLImageElement>('img', box);
-    if (!im || box.closest('.hero, .estr-hero .bg, .vbox, .seg, .emp, .fase')) return;
+    if (!im || box.classList.contains('dup') || box.closest('.hero, .vbox, .seg, .emp, .story-palco, .estr, .eng-midia, .pcard .foto-dup')) return;
     const g = box.closest('section')?.id || 'geral';
     if (!grupos.has(g)) grupos.set(g, []);
     const lista = grupos.get(g)!, pos = lista.length, [t1, t2] = legenda(box, im);

@@ -1,0 +1,32 @@
+---
+import { waLink } from '../data/site';
+
+/* Três faixas de balões correndo em sentidos opostos. Cada balão é um
+   atalho: abre o WhatsApp da SW com a pergunta já escrita. */
+const linhas = [
+  ['Quanto vou economizar na conta?', 'Precisa reforçar o telhado?', 'E em dia nublado, gera?', 'Vocês fazem a homologação na Copel?', 'Dá pra instalar em aviário?', 'Vocês atendem Santa Catarina?'],
+  ['Quanto tempo leva a instalação?', 'Quanto cabe de placa no meu galpão?', 'Como acompanho a geração?', 'O que é esse tal de Fio B?', 'Vocês fazem usina em solo?', 'Vocês fazem a manutenção depois?'],
+  ['Minha ligação é trifásica, compensa?', 'Quanto custa um sistema pra minha empresa?', 'Precisa limpar os painéis?', 'Posso visitar uma obra de vocês?', 'Os créditos de energia vencem?', 'Quero um orçamento 🙂'],
+];
+const horas = ['08:12', '09:47', '10:05', '11:30', '13:58', '14:21', '15:40', '16:26', '17:35', '18:09', '19:14', '20:33'];
+---
+<section class="sec sheet branco bolhas-sec" id="perguntas-whats" data-theme="light" data-prog="enter">
+  <div class="wrap centro">
+    <p class="kick rv">Atendimento</p>
+    <h2 class="h2 rv">Pergunte do seu jeito. A engenharia responde.</h2>
+    <p class="lead rv">Toque em uma pergunta e ela já chega no nosso WhatsApp. Sem formulário.</p>
+  </div>
+  <div class="bolhas" aria-label="Perguntas frequentes no WhatsApp">
+    {linhas.map((l, i) => (
+      <div class={`bolhas-linha ${i % 2 ? 'inv' : ''}`} style={`--vel:${70 + i * 12}s`}>
+        {[0, 1].map((k) => (
+          <ul aria-hidden={k === 1 ? 'true' : undefined}>
+            {l.map((q, j) => (
+              <li><a class="bolha" href={waLink(q)} target="_blank" rel="noopener" tabindex={k === 1 ? -1 : undefined}>{q}<time>{horas[(i * 4 + j) % horas.length]} <i>✓✓</i></time></a></li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
