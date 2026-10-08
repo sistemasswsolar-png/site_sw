@@ -1,0 +1,8 @@
+---
+import { fmt, decs } from '../data/site';
+/* Número que conta do zero até o valor quando aparece na tela.
+   O valor final já vem no HTML (SEO e navegação sem JavaScript). */
+interface Props { value: number; dec?: number; prefix?: string; dur?: number }
+const { value, dec = decs(value), prefix = '', dur } = Astro.props;
+---
+{prefix && <span class="or">{prefix}</span>}<span class="cnt" data-to={value} data-dec={dec} data-dur={dur}>{fmt(value, dec)}</span>

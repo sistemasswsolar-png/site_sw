@@ -1,0 +1,12 @@
+---
+import Img from './Img.astro';
+/* Vídeo vertical: só baixa quando o visitante clica no play. */
+interface Props { video: string; poster: string; nome?: string; sub?: string; class?: string }
+const { video, poster, nome, sub, class: cls = '' } = Astro.props;
+---
+<div class={`vbox ${cls}`}>
+  <video preload="none" playsinline controls data-src={`/video/${video}.mp4`}></video>
+  <div class="poster"><Img src={poster} alt="" widths={[400]} sizes="(max-width:900px) 50vw, 300px" /></div>
+  <button class="play" type="button" aria-label={`Reproduzir vídeo${nome ? ': ' + nome : ''}`}></button>
+  {nome && <div class="cap"><b>{nome}</b>{sub && <span>{sub}</span>}</div>}
+</div>

@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import { img } from '../lib/img';
+import { CONTATO, UNIDADES } from '../data/site';
+
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+const site = Astro.site ?? new URL('https://swsolar.com.br');
+const og = await getImage({ src: img('hero/ufv-demori'), width: 1200, format: 'jpg' });
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': UNIDADES.map((u) => ({
+    '@type': 'LocalBusiness',
+    name: `SW Solar ${u.cidade}`,
+    description: 'Engenharia e soluções em energia solar: usinas fotovoltaicas, indústria, agronegócio, comércio, monitoramento e O&M.',
+    url: site.href,
+    telephone: '+' + u.whats,
+    address: { '@type': 'PostalAddress', streetAddress: u.end, addressLocality: u.cidade, addressRegion: u.uf, addressCountry: 'BR' },
+    geo: { '@type': 'GeoCoordinates', latitude: u.lat, longitude: u.lon },
+    areaServed: ['Paraná', 'Santa Catarina'],
+    sameAs: [`https://instagram.com/${CONTATO.insta}`],
+  })),
+};
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#0a1f38" />
+  <link rel="canonical" href={new URL(Astro.url.pathname, site).href} />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={new URL(og.src, site).href} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preload" href="/fonts/sora-800.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+  <script is:inline>
+    /* Animações só para quem não pediu menos movimento. Se o JS principal
+       não carregar em 3 s, mostra tudo sem animação. */
+    (function(){var d=document.documentElement;
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion');
+        setTimeout(function(){if(!d.classList.contains('ready'))d.classList.remove('motion')},3000);}
+    })();
+  </script>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <slot />
+</body>
+</html>

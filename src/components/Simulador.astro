@@ -1,0 +1,106 @@
+---
+import { CIDADES, LIGACOES, PERFIS, DISTRIBUIDORAS, PRECO_WP } from '../data/simulador';
+const grupos = ['PR', 'SC'].map((uf) => ({ uf, nome: uf === 'PR' ? 'Paraná' : 'Santa Catarina', itens: CIDADES.map((c, i) => ({ ...c, i })).filter((c) => c.uf === uf) }));
+const meses = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+---
+<section class="sec" id="simulador"><div class="wrap">
+  <p class="kick rv">Simulador</p>
+  <h2 class="h2 rv">Quanto você economiza com energia solar.</h2>
+  <p class="lead rv">Tarifas oficiais da ANEEL, geração solar real da sua cidade e as regras da Lei 14.300. Ajuste os campos e veja o resultado na hora.</p>
+
+  <div class="sim">
+    <form id="simForm" class="rv" novalidate>
+      <div class="fld">
+        <label for="sCidade">Cidade</label>
+        <select id="sCidade" name="cidade">
+          {grupos.map((g) => (
+            <optgroup label={g.nome}>{g.itens.map((c) => <option value={c.i} selected={c.cidade === 'Ponta Grossa'}>{c.cidade}</option>)}</optgroup>
+          ))}
+        </select>
+        <small>Não achou a sua? Escolha a mais próxima.</small>
+      </div>
+      <fieldset class="fld">
+        <legend>Onde vai instalar</legend>
+        <div class="seg-ctl">{PERFIS.map((p, i) => <label><input type="radio" name="perfil" value={p.id} checked={i === 0} /><span>{p.nome}</span></label>)}</div>
+      </fieldset>
+      <fieldset class="fld">
+        <legend>Tipo de ligação</legend>
+        <div class="seg-ctl">{LIGACOES.map((l, i) => <label><input type="radio" name="ligacao" value={l.id} checked={i === 1} /><span>{l.nome}</span></label>)}</div>
+        <small>Está na conta de luz. Na dúvida, deixe bifásica.</small>
+      </fieldset>
+      <fieldset class="fld">
+        <legend>Sua conta de luz</legend>
+        <div class="seg-ctl" style="margin-bottom:12px"><label><input type="radio" name="modo" value="reais" checked /><span>Valor em R$</span></label><label><input type="radio" name="modo" value="kwh" /><span>Consumo em kWh</span></label></div>
+        <div class="valor"><input id="sValor" name="valor" type="number" inputmode="numeric" min="1" step="10" value="500" aria-label="Valor médio da conta" /><span class="un" id="sUn">R$/mês</span></div>
+        <input id="sRange" type="range" min="0" max="1000" step="1" value="400" aria-label="Ajustar valor da conta" />
+        <small id="sDica">Use a média dos últimos 12 meses.</small>
+      </fieldset>
+    </form>
+
+    <div class="res" aria-live="polite">
+      <div class="kpis rv">
+        <div class="kpi hl"><b>R$ <span id="rEcon">0</span></b><span>de economia por mês</span></div>
+        <div class="kpi"><b><span id="rPct">0</span><small>%</small></b><span>a menos na conta</span></div>
+        <div class="kpi"><b><span id="rPay">0</span><small>anos</small></b><span>para o sistema se pagar</span></div>
+        <div class="kpi"><b><span id="rKwp">0</span><small>kWp</small></b><span><span id="rMod">0</span> módulos, cerca de <span id="rArea">0</span> m²</span></div>
+        <div class="kpi"><b><span id="rGer">0</span><small>kWh</small></b><span>gerados por mês, em média</span></div>
+        <div class="kpi"><b>R$ <span id="rInv">0</span></b><span>investimento de referência</span></div>
+      </div>
+
+      <div class="contas rv">
+        <span class="ct">Conta hoje</span><span class="br hoje"><i id="bHoje"></i></span><span class="vl">R$ <span id="rHoje">0</span></span>
+        <span class="ct">Com solar</span><span class="br solar"><i id="bSolar"></i></span><span class="vl">R$ <span id="rSolar">0</span></span>
+      </div>
+
+      <div class="charts">
+        <div class="chart rv" id="cGer">
+          <h3>Geração mês a mês</h3>
+          <p>Barras: geração do sistema. Linha: seu consumo.</p>
+          <svg viewBox="0 0 360 190" role="img" aria-labelledby="cGerT"><title id="cGerT">Geração mensal estimada comparada ao consumo</title>
+            <g id="gGrid"></g>
+            {meses.map((m, i) => <rect class="bar" style={`--i:${i};transform:scaleY(0)`} x={40 + i * 26} y="15" width="19" height="145" rx="2" />)}
+            <line class="cons" id="gCons" x1="36" x2="352" y1="160" y2="160" />
+            {meses.map((m, i) => <text class="ax" x={49.5 + i * 26} y="178" text-anchor="middle">{m}</text>)}
+          </svg>
+        </div>
+        <div class="chart rv" id="cFlu" style="--i:1">
+          <h3>Retorno em 25 anos</h3>
+          <p>Saldo acumulado: investimento menos economia.</p>
+          <svg viewBox="0 0 360 190" role="img" aria-labelledby="cFluT"><title id="cFluT">Saldo acumulado do investimento ao longo de 25 anos</title>
+            <defs><linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a00" stop-opacity=".45" /><stop offset="1" stop-color="#ff7a00" stop-opacity="0" /></linearGradient></defs>
+            <g id="fGrid"></g>
+            <path class="area" id="fArea" d="" />
+            <line class="zero" id="fZero" x1="40" x2="352" y1="100" y2="100" />
+            <path class="lin" id="fLin" pathLength="1" d="" />
+            <g id="fPb"><circle class="pb" r="5" cx="0" cy="0" /><text class="pbt" x="0" y="0" text-anchor="middle"></text></g>
+            {[0, 5, 10, 15, 20, 25].map((a) => <text class="ax" x={40 + a * 12.48} y="184" text-anchor="middle">{a === 0 ? 'hoje' : `${a}a`}</text>)}
+          </svg>
+        </div>
+      </div>
+
+      <p class="aviso" id="rGrande" hidden>Acima de 75 kWp o projeto entra em minigeração e pode ter tarifa de grupo A. A engenharia da SW faz o estudo com a sua fatura.</p>
+
+      <div class="sim-cta rv">
+        <a class="btn pri" id="rWa" href="#" target="_blank" rel="noopener">Receber proposta da SW no WhatsApp</a>
+        <small>Atendimento pela unidade de <b id="rUni">Ponta Grossa</b>. Enviamos sua simulação junto.</small>
+      </div>
+
+      <details class="como">
+        <summary>Como calculamos</summary>
+        <ul>
+          <li>Tarifa sem impostos: {DISTRIBUIDORAS.PR.nome} R$ {(DISTRIBUIDORAS.PR.tusd + DISTRIBUIDORAS.PR.te).toFixed(4).replace('.', ',')}/kWh ({DISTRIBUIDORAS.PR.vigencia}) e {DISTRIBUIDORAS.SC.nome} R$ {(DISTRIBUIDORAS.SC.tusd + DISTRIBUIDORAS.SC.te).toFixed(4).replace('.', ',')}/kWh ({DISTRIBUIDORAS.SC.vigencia}). Fonte: <a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noopener">ANEEL Dados Abertos</a>.</li>
+          <li>Impostos: ICMS de 19% no PR; 12% até 150 kWh e 17% acima disso em SC; PIS/COFINS de 6%. Iluminação pública e bandeiras não entram.</li>
+          <li>Geração: média por kWp da sua cidade, mês a mês, pela base <a href="https://re.jrc.ec.europa.eu/pvg_tools/pt/" target="_blank" rel="noopener">PVGIS</a> (Comissão Europeia), com 14% de perdas e 0,5% de queda de rendimento por ano.</li>
+          <li>Lei 14.300: sobre a energia injetada e compensada paga-se o Fio B da distribuidora ({Math.round(DISTRIBUIDORAS.PR.fioB * 1000) / 1000} R$/kWh Copel; {Math.round(DISTRIBUIDORAS.SC.fioB * 1000) / 1000} R$/kWh Celesc): 60% em 2026, 75% em 2027, 90% em 2028 e 100% a partir de 2029. O custo de disponibilidade (30, 50 ou 100 kWh) continua sendo cobrado.</li>
+          <li>Consumo no mesmo instante da geração: 30% em residências e 50% em empresas. O estudo da SW usa a sua curva de consumo real.</li>
+          <li>Investimento de referência: preço médio de mercado por porte do <a href="https://www.greener.com.br/" target="_blank" rel="noopener">estudo Greener</a> do 1º semestre de 2026 (de R$ {PRECO_WP[0][1].toFixed(2).replace('.', ',')}/Wp em 2 kWp a R$ {PRECO_WP[PRECO_WP.length - 1][1].toFixed(2).replace('.', ',')}/Wp acima de 30 kWp). O valor da SW sai na proposta.</li>
+          <li>Retorno sem reajuste de tarifa (conservador). Não inclui troca de inversor nem limpeza.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</div></section>
+
+<script>
+  import '../scripts/simulador';
+</script>

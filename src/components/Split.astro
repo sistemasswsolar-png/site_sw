@@ -1,0 +1,11 @@
+---
+/* Título com palavras que sobem uma a uma. "destaque" sai em laranja, em linha própria. */
+interface Props { tag?: 'h1' | 'h2' | 'p'; text: string; destaque?: string; class?: string; delay?: number }
+const { tag: Tag = 'h2', text, destaque, class: cls = '', delay = 0 } = Astro.props;
+const a = text.split(' ');
+const b = destaque ? destaque.split(' ') : [];
+---
+<Tag class={`words ${cls}`} style={`--d0:${delay}ms`} aria-label={destaque ? `${text} ${destaque}` : text}>
+  <span aria-hidden="true">{a.map((w, i) => <><span class="w" style={`--w:${i}`}>{w}</span>{' '}</>)}</span>
+  {b.length > 0 && <span class="or" aria-hidden="true">{b.map((w, i) => <><span class="w" style={`--w:${a.length + i}`}>{w}</span>{' '}</>)}</span>}
+</Tag>

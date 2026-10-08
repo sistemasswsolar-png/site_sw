@@ -1,0 +1,33 @@
+---
+import { Picture } from 'astro:assets';
+import { img } from '../lib/img';
+
+interface Props {
+  src: string;
+  alt?: string;
+  widths?: number[];
+  sizes?: string;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  pos?: string;
+  priority?: boolean;
+}
+const { src, alt = '', widths = [480, 800, 1200], sizes = '100vw', class: cls, loading = 'lazy', pos, priority = false } = Astro.props;
+const meta = img(src);
+let ws = widths.filter((w) => w < meta.width);
+if (!ws.length || ws[ws.length - 1] < meta.width) ws.push(meta.width);
+const isPng = meta.format === 'png';
+---
+<Picture
+  src={meta}
+  alt={alt}
+  widths={ws}
+  sizes={sizes}
+  formats={isPng ? ['webp'] : ['avif', 'webp']}
+  class={cls}
+  loading={priority ? 'eager' : loading}
+  decoding="async"
+  quality={72}
+  fetchpriority={priority ? 'high' : undefined}
+  style={pos ? `object-position:${pos}` : undefined}
+/>
